@@ -110,6 +110,8 @@ func emit(pub mq.Publisher, nodeIP, stage, status, message string, data interfac
 	printBanner(lines, bannerWidth)
 
 	msg := models.DiagMessage{
+		UserID:    1,
+		SSEType:   "network_test",
 		Module:    moduleName,
 		NodeIP:    nodeIP,
 		Stage:     stage,

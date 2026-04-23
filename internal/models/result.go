@@ -3,6 +3,8 @@ package models
 import "time"
 
 type DiagMessage struct {
+	UserID    int         `json:"user_id"`
+	SSEType   string      `json:"sse_type"`
 	Module    string      `json:"module"`
 	NodeIP    string      `json:"node_ip"`
 	Stage     string      `json:"stage"`
