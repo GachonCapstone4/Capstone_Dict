@@ -26,7 +26,7 @@ type PingResult struct {
 	RTTMin      float64 `json:"rtt_min_ms"`
 	RTTAvg      float64 `json:"rtt_avg_ms"`
 	RTTMax      float64 `json:"rtt_max_ms"`
-	RawOutput   string  `json:"-"`
+	RawOutput   string  `json:"raw_output,omitempty"`
 }
 
 const (
