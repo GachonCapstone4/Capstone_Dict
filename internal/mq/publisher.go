@@ -16,7 +16,7 @@ const (
 	defaultHost  = "rabbitmq-headless.rabbitmq"
 	defaultPort  = "5672"
 	defaultVhost = "/"
-	exchangeName = "x-sse-fanout"
+	exchangeName = "x.sse.fanout"
 )
 
 type Publisher interface {
