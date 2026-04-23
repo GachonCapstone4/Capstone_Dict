@@ -74,20 +74,18 @@ func Run(pub mq.Publisher) {
 	}
 
 	// Stage 3: Gateway ICMP
-	emit(pub, nodeIP, "gateway_start", models.StatusInfo,
-		fmt.Sprintf("%s에서 게이트웨이 통신을 점검합니다....", nodeIP), nil, 68)
-
 	gwResult, err := CheckPing(gatewayIP)
 	gwStatus, gwMessage := derivePingStatus(gwResult, err)
-	emit(pub, nodeIP, "gateway_result", gwStatus, gwMessage, gwResult, 68, "", gwResult.RawOutput)
+	gwFullMsg := fmt.Sprintf("%s에서 게이트웨이 통신을 점검합니다....\n\n%s\n\n%s",
+		nodeIP, gwResult.RawOutput, gwMessage)
+	emit(pub, nodeIP, "gateway_result", gwStatus, gwFullMsg, gwResult, 68)
 
 	// Stage 4: External ICMP
-	emit(pub, nodeIP, "external_start", models.StatusInfo,
-		fmt.Sprintf("%s에서 외부 인터넷 연결 점검", nodeIP), nil, 68)
-
 	extResult, err := CheckPing(externalIP)
 	extStatus, extMessage := derivePingStatus(extResult, err)
-	emit(pub, nodeIP, "external_result", extStatus, extMessage, extResult, 68, "", extResult.RawOutput)
+	extFullMsg := fmt.Sprintf("%s에서 외부 인터넷 연결을 점검합니다....\n\n%s\n\n%s",
+		nodeIP, extResult.RawOutput, extMessage)
+	emit(pub, nodeIP, "external_result", extStatus, extFullMsg, extResult, 68)
 
 	// Stage 5: Complete
 	emit(pub, nodeIP, "complete", models.StatusInfo,
