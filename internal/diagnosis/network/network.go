@@ -79,7 +79,7 @@ func Run(pub mq.Publisher) {
 
 	gwResult, err := CheckPing(gatewayIP)
 	gwStatus, gwMessage := derivePingStatus(gwResult, err)
-	emit(pub, nodeIP, "gateway_result", gwStatus, gwMessage, gwResult, 68)
+	emit(pub, nodeIP, "gateway_result", gwStatus, gwMessage, gwResult, 68, "", gwResult.RawOutput)
 
 	// Stage 4: External ICMP
 	emit(pub, nodeIP, "external_start", models.StatusInfo,
@@ -87,7 +87,7 @@ func Run(pub mq.Publisher) {
 
 	extResult, err := CheckPing(externalIP)
 	extStatus, extMessage := derivePingStatus(extResult, err)
-	emit(pub, nodeIP, "external_result", extStatus, extMessage, extResult, 68)
+	emit(pub, nodeIP, "external_result", extStatus, extMessage, extResult, 68, "", extResult.RawOutput)
 
 	// Stage 5: Complete
 	emit(pub, nodeIP, "complete", models.StatusInfo,
@@ -102,8 +102,12 @@ func detectNodeIP() (string, error) {
 	return "", fmt.Errorf("NODE_IP 환경변수가 설정되지 않았습니다. Job manifest의 Downward API 설정을 확인하세요")
 }
 
-func emit(pub mq.Publisher, nodeIP, stage, status, message string, data interface{}, bannerWidth int) {
-	printBanner([]string{message}, bannerWidth)
+func emit(pub mq.Publisher, nodeIP, stage, status, message string, data interface{}, bannerWidth int, extraLines ...string) {
+	lines := []string{message}
+	if len(extraLines) > 0 {
+		lines = append(lines, extraLines...)
+	}
+	printBanner(lines, bannerWidth)
 
 	msg := models.DiagMessage{
 		Module:    moduleName,

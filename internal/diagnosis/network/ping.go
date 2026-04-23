@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"capstone_network_test/internal/models"
 )
@@ -26,6 +27,7 @@ func CheckPing(targetIP string) (models.PingResult, error) {
 	}
 
 	output := string(out)
+	result.RawOutput = strings.TrimRight(output, "\n")
 
 	transmitted, received, loss, err := parsePacketStats(output)
 	if err == nil {
