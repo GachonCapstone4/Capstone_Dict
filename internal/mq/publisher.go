@@ -8,6 +8,8 @@ import (
 	"os"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+
+	"capstone_network_test/internal/models"
 )
 
 const (
@@ -18,7 +20,7 @@ const (
 )
 
 type Publisher interface {
-	Publish(v interface{}) error
+	Publish(msg models.DiagMessage) error
 	Close() error
 }
 
@@ -63,8 +65,8 @@ func NewPublisher() (Publisher, error) {
 	return &amqpPublisher{conn: conn, channel: ch}, nil
 }
 
-func (p *amqpPublisher) Publish(v interface{}) error {
-	body, err := json.Marshal(v)
+func (p *amqpPublisher) Publish(msg models.DiagMessage) error {
+	body, err := json.Marshal(msg)
 	if err != nil {
 		return err
 	}
@@ -89,5 +91,5 @@ func (p *amqpPublisher) Close() error {
 	return p.conn.Close()
 }
 
-func (p *noopPublisher) Publish(_ interface{}) error { return nil }
+func (p *noopPublisher) Publish(_ models.DiagMessage) error { return nil }
 func (p *noopPublisher) Close() error                       { return nil }

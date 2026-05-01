@@ -38,9 +38,3 @@ const (
 	StatusError   = "error"
 )
 
-type SSEMessage struct {
-	UserID  int         `json:"user_id"`
-	SSEType string      `json:"sse_type"`
-	Data    interface{} `json:"data,omitempty"`
-}
-

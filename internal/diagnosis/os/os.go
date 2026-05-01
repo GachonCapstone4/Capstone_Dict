@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"capstone_network_test/internal/models"
 	"capstone_network_test/internal/mq"
@@ -14,13 +15,14 @@ func Run(pub mq.Publisher) {
 	nodeIP, err := detectNodeIP()
 	if err != nil {
 		log.Printf("[os] 노드 IP 감지 실패: %v", err)
-		emit(pub, "unknown", "start", models.StatusError, fmt.Sprintf("노드 IP 감지 실패: %v", err), nil, 32)
+		emit(pub, "unknown", "start", models.StatusError,
+			fmt.Sprintf("노드 IP 감지 실패: %v", err), "", 32)
 		return
 	}
 
 	// Stage 1: Start
 	emit(pub, nodeIP, "start", models.StatusInfo,
-		fmt.Sprintf("%s의 OS 점검을 시작합니다....", nodeIP), nil, 32)
+		fmt.Sprintf("%s의 OS 점검을 시작합니다....", nodeIP), "", 32)
 
 	// Stage 2: CPU / Load Average
 	cpuOut, err := CheckCPU()
@@ -48,7 +50,7 @@ func Run(pub mq.Publisher) {
 
 	// Stage 6: Complete
 	emit(pub, nodeIP, "complete", models.StatusInfo,
-		fmt.Sprintf("%s의 OS 점검이 완료되었습니다.", nodeIP), nil, 32)
+		fmt.Sprintf("%s의 OS 점검이 완료되었습니다.", nodeIP), "", 32)
 }
 
 func detectNodeIP() (string, error) {
@@ -65,13 +67,26 @@ func statusFromErr(err error, okMsg, errPrefix string) (string, string) {
 	return models.StatusOK, okMsg
 }
 
-func emit(pub mq.Publisher, nodeIP, stage, status, message string, data interface{}, bannerWidth int) {
+// emit publishes a DiagMessage whose Data field carries {"raw_output": rawOutput}
+// so that the SSE hub's extractText can pick it up via data["raw_output"].
+func emit(pub mq.Publisher, nodeIP, stage, status, message, rawOutput string, bannerWidth int) {
 	printBanner([]string{message}, bannerWidth)
 
-	msg := models.SSEMessage{
-		UserID:  1,
-		SSEType: "os",
-		Data:    data,
+	var data interface{}
+	if rawOutput != "" {
+		data = map[string]string{"raw_output": rawOutput}
+	}
+
+	msg := models.DiagMessage{
+		UserID:    1,
+		SSEType:   "os",
+		Module:    "os",
+		NodeIP:    nodeIP,
+		Stage:     stage,
+		Status:    status,
+		Message:   message,
+		Data:      data,
+		Timestamp: time.Now().UTC(),
 	}
 
 	if err := pub.Publish(msg); err != nil {
