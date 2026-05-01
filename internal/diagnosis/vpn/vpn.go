@@ -84,9 +84,10 @@ func deriveIperfStatus(r models.IperfResult, err error) (string, string) {
 	if err != nil {
 		return models.StatusError, fmt.Sprintf("iperf3 실행 오류: %v", err)
 	}
-	if r.RawOutput == "" {
+	if r.TCPRawOutput == "" && r.UDPRawOutput == "" {
 		return models.StatusError, "iperf3 출력 없음"
 	}
-	message := fmt.Sprintf("대역폭 측정 완료 (target: %s)\n\n%s", r.Target, r.RawOutput)
+	message := fmt.Sprintf("대역폭 측정 완료 (target: %s)\n\n[TCP -M 1380]\n%s\n\n[UDP -u -t 5]\n%s",
+		r.Target, r.TCPRawOutput, r.UDPRawOutput)
 	return models.StatusOK, message
 }

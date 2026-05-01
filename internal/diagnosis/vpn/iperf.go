@@ -14,13 +14,23 @@ func CheckIperf(target string) (models.IperfResult, error) {
 		return result, fmt.Errorf("IPERF_TARGET 환경변수가 설정되지 않았습니다")
 	}
 
-	cmd := exec.Command("iperf3", "-c", target, "-M", "1380")
-	out, err := cmd.CombinedOutput()
+	tcpCmd := exec.Command("iperf3", "-c", target, "-M", "1380")
+	tcpOut, err := tcpCmd.CombinedOutput()
 	if err != nil {
 		if _, ok := err.(*exec.ExitError); !ok {
-			return result, fmt.Errorf("iperf3 바이너리 실행 실패: %w", err)
+			return result, fmt.Errorf("iperf3 TCP 실행 실패: %w", err)
 		}
 	}
-	result.RawOutput = strings.TrimRight(string(out), "\n")
+	result.TCPRawOutput = strings.TrimRight(string(tcpOut), "\n")
+
+	udpCmd := exec.Command("iperf3", "-c", target, "-u", "-t", "5")
+	udpOut, err := udpCmd.CombinedOutput()
+	if err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			return result, fmt.Errorf("iperf3 UDP 실행 실패: %w", err)
+		}
+	}
+	result.UDPRawOutput = strings.TrimRight(string(udpOut), "\n")
+
 	return result, nil
 }
