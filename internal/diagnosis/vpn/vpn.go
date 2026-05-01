@@ -89,5 +89,10 @@ func deriveIperfStatus(r models.IperfResult, err error) (string, string) {
 	}
 	message := fmt.Sprintf("대역폭 측정 완료 (target: %s)\n\n[TCP -M 1380]\n%s\n\n[UDP -u -t 5]\n%s",
 		r.Target, r.TCPRawOutput, r.UDPRawOutput)
+
+	udpFailed := strings.Contains(r.UDPRawOutput, "재시도 실패") || strings.Contains(r.UDPRawOutput, "error")
+	if udpFailed {
+		return models.StatusWarning, message
+	}
 	return models.StatusOK, message
 }
