@@ -37,8 +37,9 @@ type TracerouteResult struct {
 }
 
 type IperfResult struct {
-	Target    string `json:"target"`
-	RawOutput string `json:"raw_output"`
+	Target        string `json:"target"`
+	TCPRawOutput  string `json:"tcp_raw_output"`
+	UDPRawOutput  string `json:"udp_raw_output"`
 }
 
 
