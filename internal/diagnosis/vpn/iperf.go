@@ -25,7 +25,7 @@ func CheckIperf(target string) (models.IperfResult, error) {
 	result.TCPRawOutput = strings.TrimRight(string(tcpOut), "\n")
 
 	// iperf3 서버가 이전 세션을 정리할 시간 확보
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	udpCmd := exec.Command("iperf3", "-c", target, "-u", "-t", "5")
 	udpOut, err := udpCmd.CombinedOutput()
