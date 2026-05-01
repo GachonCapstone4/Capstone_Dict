@@ -1,0 +1,7 @@
+iproute2
+iputils
+procps
+wireguard-tools
+traceroute
+iperf3
+netcat-openbsd
