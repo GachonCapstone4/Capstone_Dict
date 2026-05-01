@@ -31,6 +31,32 @@ type PingResult struct {
 	RawOutput   string  `json:"raw_output,omitempty"`
 }
 
+type TunnelResult struct {
+	PeerIP      string `json:"peer_ip"`
+	WGOutput    string `json:"wg_output"`
+	PingOutput  string `json:"ping_output"`
+	RawOutput   string `json:"raw_output"`
+	PeerFound   bool   `json:"peer_found"`
+	PingSuccess bool   `json:"ping_success"`
+}
+
+type TracerouteResult struct {
+	Target    string `json:"target"`
+	RawOutput string `json:"raw_output"`
+}
+
+type IperfResult struct {
+	Target    string `json:"target"`
+	RawOutput string `json:"raw_output"`
+}
+
+type PortCheckResult struct {
+	Target    string `json:"target"`
+	Port      string `json:"port"`
+	Open      bool   `json:"open"`
+	RawOutput string `json:"raw_output"`
+}
+
 const (
 	StatusInfo    = "info"
 	StatusOK      = "ok"
