@@ -15,9 +15,10 @@ type DiagMessage struct {
 }
 
 type ARPResult struct {
-	TargetIP string `json:"target_ip"`
-	MAC      string `json:"mac"`
-	State    string `json:"state"`
+	TargetIP  string `json:"target_ip"`
+	MAC       string `json:"mac"`
+	State     string `json:"state"`
+	RawOutput string `json:"raw_output"`
 }
 
 type PingResult struct {
@@ -37,9 +38,10 @@ type TracerouteResult struct {
 }
 
 type IperfResult struct {
-	Target        string `json:"target"`
-	TCPRawOutput  string `json:"tcp_raw_output"`
-	UDPRawOutput  string `json:"udp_raw_output"`
+	Target       string `json:"target"`
+	TCPRawOutput string `json:"tcp_raw_output"`
+	UDPRawOutput string `json:"udp_raw_output"`
+	RawOutput    string `json:"raw_output"`
 }
 
 
