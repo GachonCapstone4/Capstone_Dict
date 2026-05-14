@@ -25,6 +25,7 @@ func CheckIperf(target string) (models.IperfResult, error) {
 		}
 	}
 	result.TCPRawOutput = strings.TrimRight(string(tcpOut), "\n")
+	result.RawOutput = result.TCPRawOutput
 
 	//result.UDPRawOutput = runIperfUDP(target)
 

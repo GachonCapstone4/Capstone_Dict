@@ -24,6 +24,7 @@ func CheckARP(targetIP string) (models.ARPResult, error) {
 		return result, nil
 	}
 
+	result.RawOutput = output
 	mac, state := parseNeighOutput(output)
 	result.MAC = mac
 	result.State = state
