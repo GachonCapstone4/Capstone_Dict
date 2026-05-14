@@ -1,8 +1,8 @@
-## k8s node 상태점검
+## RabbitMQ 큐 상태점검
 
 skill.md 반드시 먼저 읽을것.
-internal/dignosis/k8s 디렉터리안에 메인 파일을 작성한다.
-network/os와는 달리 daemonset으로 모든 노드에서 실행될 필요 없고, controlplane에서 하나의 job만 동작하면 된다.
+internal/dignosis/rabbitmq 디렉터리안에 메인 파일을 작성한다.
+network/os와는 달리 daemonset으로 모든 노드에서 실행될 필요 없고, workernode에서 하나의 job만 동작하면 된다.
 위 점을 제외한 기본적인 점검 방법과 flow는 네트워크와 동일하다.
 summary.md의 기술된 내용과 변경점이 몇몇 존재하고 최신화 되지 못했다.
 network 점검도구가 실제로 사용되고 있으며 즉 markdown 보다 실제 internal 내부의 code가 신뢰성이 높다.
@@ -16,14 +16,9 @@ data에는 아래 점검 항목결과의 Linux cli 에서의 실행결과인 raw
 
 ### 점검항목
 
-node 컨디션점검
-kubectl get nodes 
-kubectl descirbe node (k8s-worker-1 / k8s-worker-2)
+Management Plugin를 이용한 HTTP API 호출로 사용한다.
+모든 큐의 상세 정보를 조회
+/api/queues
 
-pod status (kubectl get pod -A)
-
-### 추가사항 5/14
-pod 의 상태가 if not Running pod만 골라서 출력하기
-
-위 kubectl 명령어의 결과인 raw_data(시스템 output 데이터)가 publish 할때 큐에 data로 담겨야한다.
+위 API 명령어의 결과인 json이(시스템 output 데이터)가 publish 할때 큐에 data로 담겨야한다.`
 

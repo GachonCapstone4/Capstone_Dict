@@ -54,7 +54,43 @@ func Run(pub mq.Publisher) {
 	}
 	emit(pub, "pods_result", deriveStatus(err), msg, rawData(raw), 68)
 
+	notRunning := filterNotRunningPods(raw)
+	if notRunning == "" {
+		emit(pub, "not_running_pods_result", models.StatusOK, "비정상 파드 없음 (모든 파드 Running)", nil, 68)
+	} else {
+		emit(pub, "not_running_pods_result", models.StatusError, "비정상 파드 감지됨", rawData(notRunning), 68)
+	}
+
 	emit(pub, "complete", models.StatusInfo, "k8s 클러스터 점검이 완료되었습니다.", nil, 32)
+}
+
+// filterNotRunningPods parses `kubectl get pod -A` output and returns only non-Running pod lines.
+// Returns empty string if all pods are Running.
+func filterNotRunningPods(raw string) string {
+	lines := strings.Split(strings.TrimSpace(raw), "\n")
+	if len(lines) == 0 {
+		return ""
+	}
+
+	var result []string
+	result = append(result, lines[0]) // header
+
+	for _, line := range lines[1:] {
+		fields := strings.Fields(line)
+		// kubectl get pod -A: NAMESPACE NAME READY STATUS RESTARTS AGE
+		if len(fields) < 4 {
+			continue
+		}
+		status := fields[3]
+		if status != "Running" {
+			result = append(result, line)
+		}
+	}
+
+	if len(result) <= 1 {
+		return ""
+	}
+	return strings.Join(result, "\n")
 }
 
 func runKubectl(args ...string) (string, error) {
