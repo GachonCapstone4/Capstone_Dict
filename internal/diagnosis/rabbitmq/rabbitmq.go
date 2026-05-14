@@ -43,7 +43,7 @@ func Run(pub mq.Publisher) {
 func fetchQueues() (string, error) {
 	user := os.Getenv("RABBITMQ_USER")
 	pass := os.Getenv("RABBITMQ_PASS")
-	host := os.Getenv("RABBITMQ_HOST")
+	host := os.Getenv("RABBITMQ_MGMT_HOST")
 	port := os.Getenv("RABBITMQ_MGMT_PORT")
 
 	if host == "" {
