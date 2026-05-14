@@ -24,6 +24,8 @@ pod status (kubectl get pod -A)
 
 ### 추가사항 5/14
 pod 의 상태가 if not Running pod만 골라서 출력하기
+현재 실행되는 잡 자체에는 당연히 kubectl 명령어가 없을 것이기 때문에 k8s api 호출을 해야하며 호출결과 반환되는 output을
+그대로 받아와서 data에 넣는 방향
 
 위 kubectl 명령어의 결과인 raw_data(시스템 output 데이터)가 publish 할때 큐에 data로 담겨야한다.
 
