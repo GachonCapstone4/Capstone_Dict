@@ -1,6 +1,7 @@
 package rabbitmq
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -19,6 +20,18 @@ const (
 	defaultMgmtPort = "15672"
 )
 
+type queueInfo struct {
+	Name                   string  `json:"name"`
+	State                  string  `json:"state"`
+	Consumers              int     `json:"consumers"`
+	Messages               int     `json:"messages"`
+	MessagesReady          int     `json:"messages_ready"`
+	MessagesUnacknowledged int     `json:"messages_unacknowledged"`
+	Durable                bool    `json:"durable"`
+	AutoDelete             bool    `json:"auto_delete"`
+	ConsumerUtilisation    float64 `json:"consumer_utilisation"`
+}
+
 func Run(pub mq.Publisher) {
 	emit(pub, "start", models.StatusInfo, "RabbitMQ 큐 상태 점검을 시작합니다...", nil, 32)
 
@@ -30,9 +43,33 @@ func Run(pub mq.Publisher) {
 		return
 	}
 
+	formatted := formatQueues(rawJSON)
 	emit(pub, "queues_result", models.StatusOK, "모든 큐 상세 정보 조회 완료",
-		map[string]string{"raw_output": rawJSON}, 68)
+		map[string]string{"raw_output": formatted}, 68)
 	emit(pub, "complete", models.StatusInfo, "RabbitMQ 큐 상태 점검이 완료되었습니다.", nil, 32)
+}
+
+func formatQueues(rawJSON string) string {
+	var queues []queueInfo
+	if err := json.Unmarshal([]byte(rawJSON), &queues); err != nil {
+		return rawJSON
+	}
+
+	var sb strings.Builder
+	for i, q := range queues {
+		if i > 0 {
+			sb.WriteString("\n")
+		}
+		fmt.Fprintf(&sb, "Queue: %s\n", q.Name)
+		fmt.Fprintf(&sb, "  State:       %s\n", q.State)
+		fmt.Fprintf(&sb, "  Consumers:   %d\n", q.Consumers)
+		fmt.Fprintf(&sb, "  Messages:    %d\n", q.Messages)
+		fmt.Fprintf(&sb, "  Ready:       %d\n", q.MessagesReady)
+		fmt.Fprintf(&sb, "  Unacked:     %d\n", q.MessagesUnacknowledged)
+		fmt.Fprintf(&sb, "  Durable:     %v\n", q.Durable)
+		fmt.Fprintf(&sb, "  Auto-delete: %v", q.AutoDelete)
+	}
+	return sb.String()
 }
 
 func fetchQueues() (string, error) {
