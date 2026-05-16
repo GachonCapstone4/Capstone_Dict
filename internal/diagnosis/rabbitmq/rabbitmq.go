@@ -1,7 +1,6 @@
 package rabbitmq
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -31,16 +30,8 @@ func Run(pub mq.Publisher) {
 		return
 	}
 
-	var queues []interface{}
-	if jsonErr := json.Unmarshal([]byte(rawJSON), &queues); jsonErr != nil {
-		emit(pub, "queues_result", models.StatusOK, "모든 큐 상세 정보 조회 완료",
-			map[string]string{"raw_output": rawJSON}, 68)
-		emit(pub, "complete", models.StatusInfo, "RabbitMQ 큐 상태 점검이 완료되었습니다.", nil, 32)
-		return
-	}
-
-	data := map[string]interface{}{"queues": queues}
-	emit(pub, "queues_result", models.StatusOK, "모든 큐 상세 정보 조회 완료", data, 68)
+	emit(pub, "queues_result", models.StatusOK, "모든 큐 상세 정보 조회 완료",
+		map[string]string{"raw_output": rawJSON}, 68)
 	emit(pub, "complete", models.StatusInfo, "RabbitMQ 큐 상태 점검이 완료되었습니다.", nil, 32)
 }
 
